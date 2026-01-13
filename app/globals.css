@@ -24,6 +24,7 @@ html {
 
 body {
   font-family: 'Inter', sans-serif;
+  font-weight: 700;
   background-color: var(--dark);
   color: #ffffff;
   overflow-x: hidden;
@@ -33,8 +34,12 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Playfair Display', serif;
-  font-weight: 700;
+  font-weight: 900;
   line-height: 1.2;
+}
+
+p, span, a, div, button, input, textarea, select, label {
+  font-weight: 700;
 }
 
 /* Smooth scrolling with Lenis */
