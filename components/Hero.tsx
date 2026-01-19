@@ -1,105 +1,72 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { gsap } from 'gsap'
 import { ArrowRight } from 'lucide-react'
 
 export default function Hero() {
-  const heroRef = useRef<HTMLDivElement>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
-  const subtitleRef = useRef<HTMLParagraphElement>(null)
   const buttonsRef = useRef<HTMLDivElement>(null)
-  const [isLoaded, setIsLoaded] = useState(false)
 
   useEffect(() => {
-    let ctx: gsap.Context | null = null
+    // Устанавливаем начальные стили
+    if (titleRef.current) {
+      gsap.set(titleRef.current, { opacity: 0, y: 50 })
+    }
+    if (buttonsRef.current) {
+      const buttons = Array.from(buttonsRef.current.children) as HTMLElement[]
+      buttons.forEach(btn => gsap.set(btn, { opacity: 0, y: 30 }))
+    }
 
-    // Небольшая задержка для обеспечения загрузки DOM
-    const timer = setTimeout(() => {
-      // Устанавливаем начальные стили для плавной анимации
+    const ctx = gsap.context(() => {
+      // Анимация заголовка
       if (titleRef.current) {
-        gsap.set(titleRef.current, { opacity: 0, y: 50 })
+        gsap.to(titleRef.current, {
+          opacity: 1,
+          y: 0,
+          duration: 1.2,
+          delay: 0.3,
+          ease: 'power3.out',
+        })
       }
-      if (subtitleRef.current) {
-        gsap.set(subtitleRef.current, { opacity: 0, y: 30 })
+
+      // Анимация кнопок
+      if (buttonsRef.current) {
+        const buttons = Array.from(buttonsRef.current.children) as HTMLElement[]
+        gsap.to(buttons, {
+          opacity: 1,
+          y: 0,
+          duration: 0.9,
+          delay: 0.6,
+          stagger: 0.15,
+          ease: 'power3.out',
+        })
+      }
+    }, contentRef)
+
+    // Fallback: если через 2 секунды элементы не появились, делаем их видимыми
+    const fallbackTimer = setTimeout(() => {
+      if (titleRef.current) {
+        gsap.set(titleRef.current, { opacity: 1, y: 0 })
       }
       if (buttonsRef.current) {
         const buttons = Array.from(buttonsRef.current.children) as HTMLElement[]
-        buttons.forEach(btn => {
-          gsap.set(btn, { opacity: 0, y: 30 })
-        })
-      }
-
-      ctx = gsap.context(() => {
-        // Анимация заголовка
-        if (titleRef.current) {
-          gsap.to(titleRef.current, {
-            opacity: 1,
-            y: 0,
-            duration: 1.2,
-            ease: 'power3.out',
-          })
-        }
-        
-        // Анимация подзаголовка
-        if (subtitleRef.current) {
-          gsap.to(subtitleRef.current, {
-            opacity: 1,
-            y: 0,
-            duration: 1,
-            delay: 0.3,
-            ease: 'power3.out',
-          })
-        }
-        
-        // Анимация кнопок
-        if (buttonsRef.current && buttonsRef.current.children.length > 0) {
-          const buttons = Array.from(buttonsRef.current.children) as HTMLElement[]
-          gsap.to(buttons, {
-            opacity: 1,
-            y: 0,
-            duration: 0.9,
-            delay: 0.6,
-            stagger: 0.15,
-            ease: 'power3.out',
-            onComplete: () => {
-              setIsLoaded(true)
-            }
-          })
-        } else {
-          setIsLoaded(true)
-        }
-      }, heroRef)
-    }, 100)
-
-    // Фолбэк: если через 2 секунды кнопки не появились, делаем их видимыми
-    const fallbackTimer = setTimeout(() => {
-      if (buttonsRef.current && buttonsRef.current.children.length > 0) {
-        const buttons = Array.from(buttonsRef.current.children) as HTMLElement[]
-        buttons.forEach(btn => {
-          gsap.set(btn, { opacity: 1, y: 0 })
-        })
-        setIsLoaded(true)
+        buttons.forEach(btn => gsap.set(btn, { opacity: 1, y: 0 }))
       }
     }, 2000)
 
     return () => {
-      clearTimeout(timer)
+      ctx.revert()
       clearTimeout(fallbackTimer)
-      if (ctx) {
-        ctx.revert()
-      }
     }
   }, [])
 
   return (
-    <section
-      ref={heroRef}
-      className="relative h-screen flex items-center justify-center overflow-hidden"
-    >
-      {/* Background Image/Video */}
-      <div className="absolute inset-0 z-0">
+    <section className="relative h-screen flex items-center justify-center overflow-hidden bg-dark">
+      {/* Background Image */}
+      <div className="absolute inset-0 z-0 bg-dark">
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
@@ -111,40 +78,32 @@ export default function Hero() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-4 lg:px-8 text-center">
+      <div ref={contentRef} className="relative z-20 container mx-auto px-4 lg:px-8 text-center">
         <h1
           ref={titleRef}
-          className="text-5xl md:text-7xl lg:text-8xl font-serif font-black text-gold-500 mb-6"
-          style={{ opacity: 0 }}
+          className="text-4xl md:text-6xl lg:text-7xl font-serif font-black text-white mb-8 drop-shadow-2xl"
+          style={{ opacity: 0, textShadow: '0 4px 20px rgba(0, 0, 0, 0.8)' }}
         >
-          Элитная недвижимость
+          Эксклюзивный портфель
           <br />
-          <span className="text-white">Дубая</span>
+          <span className="text-gold-500">предложений</span>
         </h1>
-        <p
-          ref={subtitleRef}
-          className="text-xl md:text-2xl lg:text-3xl text-white/90 mb-12 max-w-3xl mx-auto font-bold"
-          style={{ opacity: 0 }}
-        >
-          Откройте для себя мир премиального образа жизни
-        </p>
         <div 
           ref={buttonsRef} 
-          className="flex flex-col sm:flex-row gap-4 justify-center"
-          style={{ visibility: 'visible', opacity: 1 }}
+          className="flex flex-col sm:flex-row gap-4 justify-center items-center"
         >
           <Link
             href="/catalog"
-            className="bg-gold-500 text-dark px-8 py-4 rounded-lg font-bold text-lg hover:bg-gold-400 transition-all duration-300 flex items-center justify-center space-x-2 group glow-gold"
+            className="bg-gold-500 text-dark px-8 py-4 rounded-lg font-bold text-lg hover:bg-gold-400 transition-all duration-300 flex items-center justify-center space-x-2 group glow-gold opacity-0 shadow-2xl"
           >
-            <span>Исследовать объекты</span>
-            <ArrowRight className="group-hover:translate-x-1 transition-transform" />
+            <span>Недвижимости</span>
+            <ArrowRight className="group-hover:translate-x-1 transition-transform" size={20} />
           </Link>
           <Link
             href="/contacts"
-            className="border-2 border-gold-500 text-gold-500 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gold-500/10 transition-all duration-300"
+            className="border-2 border-gold-500 text-gold-500 bg-dark/30 backdrop-blur-sm px-8 py-4 rounded-lg font-bold text-lg hover:bg-gold-500/20 transition-all duration-300 opacity-0 shadow-2xl"
           >
-            Получить
+            Подробности по заявке
           </Link>
         </div>
       </div>
@@ -158,4 +117,3 @@ export default function Hero() {
     </section>
   )
 }
-

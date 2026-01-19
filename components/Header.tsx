@@ -8,7 +8,7 @@ import { gsap } from 'gsap'
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
   const overlayRef = useRef<HTMLDivElement>(null)
 
@@ -21,7 +21,7 @@ export default function Header() {
   }, [])
 
   useEffect(() => {
-    if (isMobileMenuOpen) {
+    if (isMenuOpen) {
       // Небольшая задержка для обновления DOM
       const timer = setTimeout(() => {
         if (menuRef.current && overlayRef.current) {
@@ -59,7 +59,7 @@ export default function Header() {
         document.body.style.overflow = ''
       }
     }
-  }, [isMobileMenuOpen])
+  }, [isMenuOpen])
 
   const navItems = [
     { href: '/', label: 'Главная' },
@@ -78,10 +78,13 @@ export default function Header() {
       }`}
     >
       <nav className="container mx-auto px-4 lg:px-8">
-        <div className="flex items-center justify-between h-20">
-          {/* Logo */}
-          <Link href="/" className="flex items-center space-x-3">
-            <div className="relative h-12 w-12 flex-shrink-0">
+        <div className="relative flex items-center justify-between h-20">
+          {/* Empty left side for balance */}
+          <div className="flex-1"></div>
+
+          {/* Center Logo */}
+          <Link href="/" className="absolute left-1/2 flex items-center justify-center" style={{ transform: 'translate(-50%, 0.5px)' }}>
+            <div className="relative h-32 w-32 md:h-40 md:w-40 lg:h-44 lg:w-44 flex-shrink-0">
               <Image
                 src="/logo.png"
                 alt="CROWN LINE PROPERTY"
@@ -95,60 +98,35 @@ export default function Header() {
                 }}
               />
             </div>
-            <div className="flex flex-col">
-              <div className="text-gold-500 font-serif text-xl font-bold leading-tight">
-                CROWN LINE
-              </div>
-              <div className="text-gold-500 text-xs font-sans leading-tight">PROPERTY</div>
-            </div>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center space-x-8">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="text-white hover:text-gold-500 transition-colors duration-300 relative group"
-              >
-                {item.label}
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gold-500 transition-all duration-300 group-hover:w-full" />
-              </Link>
-            ))}
-            <Link
-              href="/contacts"
-              className="bg-gold-500 text-dark px-6 py-2 rounded-lg font-semibold hover:bg-gold-400 transition-colors duration-300 flex items-center space-x-2"
+          {/* Right Menu Button - Visible on all screens */}
+          <div className="flex-1 flex justify-end">
+            <button
+              className="text-white hover:text-gold-500 transition-colors"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-label="Toggle menu"
             >
-              <Phone size={18} />
-              <span>Консультация</span>
-            </Link>
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
           </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            className="lg:hidden text-white hover:text-gold-500 transition-colors"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            aria-label="Toggle menu"
-          >
-            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
         </div>
 
-        {/* Mobile Menu Overlay */}
-        {isMobileMenuOpen && (
+        {/* Menu Overlay - Works on all screens */}
+        {isMenuOpen && (
           <>
             {/* Overlay */}
             <div
               ref={overlayRef}
-              className="fixed inset-0 bg-black/60 z-40 lg:hidden"
-              onClick={() => setIsMobileMenuOpen(false)}
+              className="fixed inset-0 bg-black/60 z-40"
+              onClick={() => setIsMenuOpen(false)}
               style={{ opacity: 0 }}
             />
             
             {/* Side Menu */}
             <div
               ref={menuRef}
-              className="fixed top-0 left-0 h-full w-80 max-w-[85vw] z-50 lg:hidden"
+              className="fixed top-0 left-0 h-full w-80 max-w-[85vw] z-50"
               style={{
                 background: 'linear-gradient(180deg, #020202 0%, #2b2f38 100%)',
                 transform: 'translateX(-100%)',
@@ -158,7 +136,7 @@ export default function Header() {
                 {/* Close Button */}
                 <div className="flex justify-end mb-8">
                   <button
-                    onClick={() => setIsMobileMenuOpen(false)}
+                    onClick={() => setIsMenuOpen(false)}
                     className="text-white hover:text-gold-500 transition-colors"
                     aria-label="Close menu"
                   >
@@ -173,7 +151,7 @@ export default function Header() {
                       key={item.href}
                       href={item.href}
                       className="text-white hover:text-gold-500 transition-colors py-3 text-lg font-bold border-b border-white/10"
-                      onClick={() => setIsMobileMenuOpen(false)}
+                      onClick={() => setIsMenuOpen(false)}
                     >
                       {item.label}
                     </Link>
@@ -184,7 +162,7 @@ export default function Header() {
                 <Link
                   href="/contacts"
                   className="mt-auto bg-gold-500 text-dark px-6 py-4 rounded-lg font-bold text-center flex items-center justify-center space-x-2 hover:bg-gold-400 transition-colors"
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  onClick={() => setIsMenuOpen(false)}
                 >
                   <Phone size={20} />
                   <span>Консультация</span>

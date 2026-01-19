@@ -1,14 +1,14 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, ChevronDown } from 'lucide-react'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const categories = [
+const mainCategories = [
   {
     id: 'rental-residential',
     title: 'Аренда жилой недвижимости',
@@ -43,9 +43,39 @@ const categories = [
   },
 ]
 
+const additionalCategories = [
+  {
+    id: 'exclusives',
+    title: 'Эксклюзивы',
+    subtitle: 'Уникальные объекты премиум класса',
+    image: 'https://images.unsplash.com/photo-1613977257363-707ba9348227?q=80&w=2070',
+    href: '/catalog?type=exclusives',
+    count: 45,
+  },
+  {
+    id: 'hotels',
+    title: 'Отели',
+    subtitle: 'Готовый бизнес в сфере гостеприимства',
+    image: 'https://images.unsplash.com/photo-1564501049412-61c2a3083791?q=80&w=2089',
+    href: '/catalog?type=hotels',
+    count: 28,
+  },
+  {
+    id: 'land',
+    title: 'Земельные участки',
+    subtitle: 'Продажа земельных участков',
+    image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=2059',
+    href: '/catalog?type=land',
+    count: 67,
+  },
+]
+
 export default function PropertyCategories() {
   const sectionRef = useRef<HTMLDivElement>(null)
   const cardsRef = useRef<(HTMLAnchorElement | null)[]>([])
+  const additionalCardsRef = useRef<(HTMLAnchorElement | null)[]>([])
+  const [showMore, setShowMore] = useState(false)
+  const additionalContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!sectionRef.current) return
@@ -84,6 +114,31 @@ export default function PropertyCategories() {
     }
   }, [])
 
+  useEffect(() => {
+    if (showMore && additionalContainerRef.current) {
+      const cards = additionalCardsRef.current.filter(Boolean)
+      if (cards.length === 0) return
+
+      const ctx = gsap.context(() => {
+        cards.forEach((card, index) => {
+          if (card) {
+            gsap.from(card, {
+              opacity: 0,
+              y: 50,
+              duration: 0.8,
+              delay: index * 0.1,
+              ease: 'power3.out',
+            })
+          }
+        })
+      }, additionalContainerRef)
+
+      return () => {
+        ctx.revert()
+      }
+    }
+  }, [showMore])
+
   return (
     <section ref={sectionRef} className="luxury-spacing bg-dark">
       <div className="container mx-auto px-4 lg:px-8">
@@ -97,7 +152,7 @@ export default function PropertyCategories() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
-          {categories.map((category, index) => (
+          {mainCategories.map((category, index) => (
             <Link
               key={category.id}
               href={category.href}
@@ -138,6 +193,65 @@ export default function PropertyCategories() {
             </Link>
           ))}
         </div>
+
+        {/* Additional Categories - Hidden by default */}
+        {showMore && (
+          <div ref={additionalContainerRef} className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 mt-8 lg:mt-12">
+            {additionalCategories.map((category, index) => (
+              <Link
+                key={category.id}
+                href={category.href}
+                ref={(el) => {
+                  if (el) additionalCardsRef.current[index] = el
+                }}
+                className="group relative overflow-hidden rounded-2xl aspect-[4/3] cursor-pointer"
+              >
+                {/* Background Image */}
+                <div
+                  className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
+                  style={{ backgroundImage: `url(${category.image})` }}
+                />
+                
+                {/* Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-dark via-dark/60 to-transparent" />
+                <div className="absolute inset-0 bg-gold-500/0 group-hover:bg-gold-500/10 transition-colors duration-300" />
+
+                {/* Content */}
+                <div className="absolute inset-0 flex flex-col justify-end p-8 lg:p-12">
+                  <div className="relative z-10">
+                    <div className="text-gold-500 text-sm font-semibold mb-2">
+                      {category.count} объектов
+                    </div>
+                    <h3 className="text-3xl lg:text-4xl font-serif text-white mb-3 group-hover:text-gold-500 transition-colors">
+                      {category.title}
+                    </h3>
+                    <p className="text-white/80 mb-6">{category.subtitle}</p>
+                    <div className="flex items-center text-gold-500 font-semibold group-hover:translate-x-2 transition-transform duration-300">
+                      <span>Подробнее</span>
+                      <ArrowRight className="ml-2" size={20} />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Border on Hover */}
+                <div className="absolute inset-0 border-2 border-transparent group-hover:border-gold-500 rounded-2xl transition-colors duration-300" />
+              </Link>
+            ))}
+          </div>
+        )}
+
+        {/* Show More Button */}
+        {!showMore && (
+          <div className="text-center mt-12">
+            <button
+              onClick={() => setShowMore(true)}
+              className="bg-gold-500 text-dark px-8 py-4 rounded-lg font-bold text-lg hover:bg-gold-400 transition-all duration-300 flex items-center justify-center space-x-2 mx-auto group"
+            >
+              <span>Больше</span>
+              <ChevronDown className="group-hover:translate-y-1 transition-transform" size={20} />
+            </button>
+          </div>
+        )}
       </div>
     </section>
   )

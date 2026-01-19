@@ -21,7 +21,7 @@ const advantages = [
   {
     icon: Users,
     title: 'Экспертиза рынка',
-    description: '10+ лет опыта работы на рынке недвижимости Дубая',
+    description: '20+ лет опыта по всему миру',
   },
   {
     icon: FileCheck,

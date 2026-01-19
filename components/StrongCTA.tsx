@@ -6,9 +6,16 @@ import { ScrollTrigger } from 'gsap/dist/ScrollTrigger'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Send, CheckCircle } from 'lucide-react'
+import { Send, CheckCircle, Search, ChevronDown } from 'lucide-react'
 
 gsap.registerPlugin(ScrollTrigger)
+
+interface Country {
+  code: string
+  name: string
+  dialCode: string
+  flag: string
+}
 
 const formSchema = z.object({
   name: z.string().min(2, 'Имя должно содержать минимум 2 символа'),
@@ -23,15 +30,97 @@ export default function StrongCTA() {
   const sectionRef = useRef<HTMLDivElement>(null)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [countries, setCountries] = useState<Country[]>([])
+  const [selectedCountry, setSelectedCountry] = useState<Country | null>(null)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [phoneNumber, setPhoneNumber] = useState('50 123 45 67')
+  const [isLoadingCountries, setIsLoadingCountries] = useState(true)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+  const phoneInputRef = useRef<HTMLInputElement>(null)
+
+  // Загружаем страны при монтировании компонента
+  useEffect(() => {
+    const fetchCountries = async () => {
+      try {
+        setIsLoadingCountries(true)
+        const response = await fetch('/api/countries')
+        if (!response.ok) throw new Error('Failed to fetch countries')
+        
+        const data = await response.json()
+        setCountries(data.countries)
+        
+        // Устанавливаем ОАЭ по умолчанию
+        const uaeCountry = data.countries.find((c: Country) => c.code === 'AE')
+        if (uaeCountry) {
+          setSelectedCountry(uaeCountry)
+        } else if (data.countries.length > 0) {
+          setSelectedCountry(data.countries[0])
+        }
+      } catch (error) {
+        console.error('Error loading countries:', error)
+        // Fallback к статическому списку при ошибке
+        const fallbackCountries: Country[] = [
+          { code: 'AE', name: 'ОАЭ (Дубай)', dialCode: '+971', flag: '🇦🇪' },
+          { code: 'RU', name: 'Россия', dialCode: '+7', flag: '🇷🇺' },
+          { code: 'US', name: 'США', dialCode: '+1', flag: '🇺🇸' },
+        ]
+        setCountries(fallbackCountries)
+        setSelectedCountry(fallbackCountries[0])
+      } finally {
+        setIsLoadingCountries(false)
+      }
+    }
+
+    fetchCountries()
+  }, [])
+
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
+    watch,
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
   })
+
+  // Обновляем значение телефона при изменении страны или номера
+  useEffect(() => {
+    if (selectedCountry) {
+      const fullPhone = `${selectedCountry.dialCode} ${phoneNumber}`.replace(/\s/g, '')
+      setValue('phone', fullPhone)
+    }
+  }, [selectedCountry, phoneNumber, setValue])
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false)
+        setSearchQuery('')
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  const filteredCountries = countries.filter((country) => {
+    if (!searchQuery) return true
+    return (
+      country.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      country.dialCode.includes(searchQuery)
+    )
+  })
+
+  const handleCountrySelect = (country: Country) => {
+    setSelectedCountry(country)
+    setIsDropdownOpen(false)
+    setSearchQuery('')
+    phoneInputRef.current?.focus()
+  }
 
   useEffect(() => {
     if (!sectionRef.current) return
@@ -150,13 +239,115 @@ ${data.message ? `💬 Сообщение: ${data.message}` : ''}
                 )}
               </div>
               <div>
-                <label className="block text-white mb-2">Телефон *</label>
-                <input
-                  {...register('phone')}
-                  type="tel"
-                  className="w-full px-4 py-3 bg-dark border border-gold-500/30 rounded-lg text-white focus:outline-none focus:border-gold-500 transition-colors"
-                  placeholder="+7 (999) 123-45-67"
-                />
+                <label className="block text-white mb-2 font-bold">Телефон *</label>
+                <div className="relative" ref={dropdownRef}>
+                  <div className="flex items-center border border-gold-500/30 rounded-lg bg-dark overflow-hidden hover:border-gold-500/50 focus-within:border-gold-500 transition-colors">
+                    {/* Country Selector Button */}
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault()
+                        if (!isLoadingCountries) {
+                          setIsDropdownOpen(!isDropdownOpen)
+                        }
+                      }}
+                      disabled={isLoadingCountries || !selectedCountry}
+                      className="flex items-center space-x-2 px-3 py-3 hover:bg-gold-500/10 transition-colors border-r border-gold-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                      type="button"
+                    >
+                      {isLoadingCountries ? (
+                        <span className="text-white/60 text-sm">Загрузка...</span>
+                      ) : selectedCountry ? (
+                        <>
+                          <span className="text-2xl leading-none" style={{ fontFamily: 'system-ui' }}>
+                            {selectedCountry.flag}
+                          </span>
+                          <span className="text-white/90 text-sm font-bold">{selectedCountry.dialCode}</span>
+                          <ChevronDown 
+                            size={16} 
+                            className={`text-gold-500 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
+                          />
+                        </>
+                      ) : null}
+                    </button>
+                    
+                    {/* Phone Input */}
+                    <input
+                      ref={phoneInputRef}
+                      type="tel"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      className="flex-1 bg-transparent text-white/90 text-sm px-4 py-3 outline-none placeholder-white/40"
+                      placeholder="50 123 45 67"
+                    />
+                  </div>
+
+                  {/* Hidden input for form validation */}
+                  {selectedCountry && (
+                    <input
+                      {...register('phone')}
+                      type="hidden"
+                      value={`${selectedCountry.dialCode} ${phoneNumber}`.replace(/\s/g, '')}
+                    />
+                  )}
+
+                  {/* Dropdown Menu */}
+                  {isDropdownOpen && (
+                    <div className="absolute top-full left-0 mt-2 w-72 bg-dark border border-gold-500/30 rounded-lg shadow-xl z-50 max-h-80 overflow-hidden">
+                      {/* Search Input */}
+                      <div className="p-3 border-b border-gold-500/20">
+                        <div className="relative">
+                          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gold-500" size={18} />
+                          <input
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder="Поиск страны..."
+                            className="w-full bg-dark/50 border border-gold-500/30 rounded-lg pl-10 pr-4 py-2 text-white/90 text-sm outline-none focus:border-gold-500 placeholder-white/40 font-bold"
+                            autoFocus
+                          />
+                        </div>
+                      </div>
+
+                      {/* Countries List */}
+                      <div className="overflow-y-auto max-h-64">
+                        {isLoadingCountries ? (
+                          <div className="px-4 py-8 text-center text-white/60 text-sm">
+                            Загрузка стран...
+                          </div>
+                        ) : filteredCountries.length > 0 ? (
+                          filteredCountries.map((country) => (
+                            <button
+                              key={country.code}
+                              onClick={(e) => {
+                                e.preventDefault()
+                                handleCountrySelect(country)
+                              }}
+                              className={`w-full flex items-center space-x-3 px-4 py-3 hover:bg-gold-500/10 transition-colors text-left ${
+                                selectedCountry?.code === country.code ? 'bg-gold-500/10' : ''
+                              }`}
+                              type="button"
+                            >
+                              <span className="text-2xl leading-none" style={{ fontFamily: 'system-ui' }}>
+                                {country.flag}
+                              </span>
+                              <div className="flex-1">
+                                <div className="text-white/90 text-sm font-bold">{country.name}</div>
+                                <div className="text-white/60 text-xs">{country.dialCode}</div>
+                              </div>
+                              {selectedCountry?.code === country.code && (
+                                <div className="w-2 h-2 rounded-full bg-gold-500"></div>
+                              )}
+                            </button>
+                          ))
+                        ) : (
+                          <div className="px-4 py-8 text-center text-white/60 text-sm">
+                            Страна не найдена
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
                 {errors.phone && (
                   <p className="text-red-400 text-sm mt-1">{errors.phone.message}</p>
                 )}

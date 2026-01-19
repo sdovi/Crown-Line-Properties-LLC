@@ -11,7 +11,6 @@ import PartnerLogos from '@/components/PartnerLogos'
 import FAQ from '@/components/FAQ'
 import StrongCTA from '@/components/StrongCTA'
 import Footer from '@/components/Footer'
-import Statistics from '@/components/Statistics'
 
 export default function Home() {
   return (
@@ -19,14 +18,13 @@ export default function Home() {
       <Header />
       <Hero />
       <PropertyCategories />
-      <Statistics />
       <FeaturedProperties />
       <InvestmentOpportunities />
       <PropertyGeography />
       <CompanyAdvantages />
       <WorkProcess />
-      <ClientTestimonials />
-      <PartnerLogos />
+      {/* <ClientTestimonials /> */}
+      {/* <PartnerLogos /> */}
       <FAQ />
       <StrongCTA />
       <Footer />

@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Phone, Mail, MapPin, Facebook, Instagram, Twitter } from 'lucide-react'
 
 export default function Footer() {
+
   return (
     <footer className="bg-dark border-t border-gold-500/20">
       <div className="container mx-auto px-4 lg:px-8 py-12">
@@ -134,7 +135,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-gold-500/20 pt-8 text-center text-white/60 text-sm">
-          <p>© {new Date().getFullYear()} CROWN LINE PROPERTY. Все права защищены.</p>
+          <p>© 2020 CROWN LINE PROPERTY. Все права защищены.</p>
         </div>
       </div>
     </footer>
