@@ -25,7 +25,7 @@ export default function Home() {
       <WorkProcess />
       {/* <ClientTestimonials /> */}
       {/* <PartnerLogos /> */}
-      <FAQ />
+      {/* <FAQ /> */}
       <StrongCTA />
       <Footer />
     </main>
