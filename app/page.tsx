@@ -22,7 +22,7 @@ export default function Home() {
       <InvestmentOpportunities />
       <PropertyGeography />
       <CompanyAdvantages />
-      <WorkProcess />
+      {/* <WorkProcess /> */}
       {/* <ClientTestimonials /> */}
       {/* <PartnerLogos /> */}
       {/* <FAQ /> */}

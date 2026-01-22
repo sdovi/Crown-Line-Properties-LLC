@@ -110,9 +110,11 @@ export async function GET(request: Request) {
       })
       .filter((country: Country | null) => country !== null)
       .sort((a: Country, b: Country) => {
-        // Сортируем: сначала ОАЭ, затем остальные по алфавиту
+        // Сортируем: сначала ОАЭ, затем остальные по алфавиту, Россия в конце
         if (a.code === 'AE') return -1
         if (b.code === 'AE') return 1
+        if (a.code === 'RU') return 1
+        if (b.code === 'RU') return -1
         return a.name.localeCompare(b.name, 'ru')
       })
 
