@@ -108,20 +108,29 @@ export async function GET(request: Request) {
           flag: flag,
         }
       })
-      .filter((country: Country | null) => country !== null)
-      .sort((a: Country, b: Country) => {
-        // Сортируем: сначала ОАЭ, затем остальные по алфавиту, Россия в конце
-        if (a.code === 'AE') return -1
-        if (b.code === 'AE') return 1
-        if (a.code === 'RU') return 1
-        if (b.code === 'RU') return -1
-        return a.name.localeCompare(b.name, 'ru')
-      })
+      .filter((country: Country | null) => country !== null) as Country[]
+    
+    // Разделяем страны на группы
+    const uaeCountry = countries.find((c: Country) => c.code === 'AE')
+    const russiaCountry = countries.find((c: Country) => c.code === 'RU')
+    const otherCountries = countries.filter((c: Country) => c.code !== 'AE' && c.code !== 'RU')
+    
+    // Сортируем остальные страны по алфавиту
+    otherCountries.sort((a: Country, b: Country) => a.name.localeCompare(b.name, 'ru'))
+    
+    // Собираем финальный массив: ОАЭ первый, остальные по алфавиту, Россия последняя
+    const sortedCountries: Country[] = []
+    if (uaeCountry) sortedCountries.push(uaeCountry)
+    sortedCountries.push(...otherCountries)
+    if (russiaCountry) sortedCountries.push(russiaCountry)
+    
+    // Используем отсортированный массив
+    const finalCountries = sortedCountries
 
     // Фильтруем по поисковому запросу, если есть
-    let filteredCountries = countries
+    let filteredCountries = finalCountries
     if (search) {
-      filteredCountries = countries.filter((country) =>
+      filteredCountries = finalCountries.filter((country) =>
         country.name.toLowerCase().includes(search.toLowerCase()) ||
         country.dialCode.includes(search)
       )
