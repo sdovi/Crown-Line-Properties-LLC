@@ -2,45 +2,57 @@
 
 import { useEffect, useRef } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { gsap } from 'gsap'
-import { ArrowRight } from 'lucide-react'
 
 export default function Hero() {
   const contentRef = useRef<HTMLDivElement>(null)
-  const titleRef = useRef<HTMLHeadingElement>(null)
-  const buttonsRef = useRef<HTMLDivElement>(null)
+  const logoRef = useRef<HTMLDivElement>(null)
+  const taglineRef = useRef<HTMLParagraphElement>(null)
+  const buttonRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     // Устанавливаем начальные стили
-    if (titleRef.current) {
-      gsap.set(titleRef.current, { opacity: 0, y: 50 })
+    if (logoRef.current) {
+      gsap.set(logoRef.current, { opacity: 0, scale: 0.8 })
     }
-    if (buttonsRef.current) {
-      const buttons = Array.from(buttonsRef.current.children) as HTMLElement[]
-      buttons.forEach(btn => gsap.set(btn, { opacity: 0, y: 30 }))
+    if (taglineRef.current) {
+      gsap.set(taglineRef.current, { opacity: 0, y: 30 })
+    }
+    if (buttonRef.current) {
+      gsap.set(buttonRef.current, { opacity: 0, y: 30 })
     }
 
     const ctx = gsap.context(() => {
-      // Анимация заголовка
-      if (titleRef.current) {
-        gsap.to(titleRef.current, {
+      // Анимация логотипа
+      if (logoRef.current) {
+        gsap.to(logoRef.current, {
           opacity: 1,
-          y: 0,
+          scale: 1,
           duration: 1.2,
           delay: 0.3,
           ease: 'power3.out',
         })
       }
 
-      // Анимация кнопок
-      if (buttonsRef.current) {
-        const buttons = Array.from(buttonsRef.current.children) as HTMLElement[]
-        gsap.to(buttons, {
+      // Анимация теглайна
+      if (taglineRef.current) {
+        gsap.to(taglineRef.current, {
           opacity: 1,
           y: 0,
           duration: 0.9,
-          delay: 0.6,
-          stagger: 0.15,
+          delay: 0.8,
+          ease: 'power3.out',
+        })
+      }
+
+      // Анимация кнопки
+      if (buttonRef.current) {
+        gsap.to(buttonRef.current, {
+          opacity: 1,
+          y: 0,
+          duration: 0.9,
+          delay: 1.1,
           ease: 'power3.out',
         })
       }
@@ -48,12 +60,14 @@ export default function Hero() {
 
     // Fallback: если через 2 секунды элементы не появились, делаем их видимыми
     const fallbackTimer = setTimeout(() => {
-      if (titleRef.current) {
-        gsap.set(titleRef.current, { opacity: 1, y: 0 })
+      if (logoRef.current) {
+        gsap.set(logoRef.current, { opacity: 1, scale: 1 })
       }
-      if (buttonsRef.current) {
-        const buttons = Array.from(buttonsRef.current.children) as HTMLElement[]
-        buttons.forEach(btn => gsap.set(btn, { opacity: 1, y: 0 }))
+      if (taglineRef.current) {
+        gsap.set(taglineRef.current, { opacity: 1, y: 0 })
+      }
+      if (buttonRef.current) {
+        gsap.set(buttonRef.current, { opacity: 1, y: 0 })
       }
     }, 2000)
 
@@ -65,45 +79,46 @@ export default function Hero() {
 
   return (
     <section className="relative h-screen flex items-center justify-center overflow-hidden bg-dark">
-      {/* Background Image */}
-      <div className="absolute inset-0 z-0 bg-dark">
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage:
-              "url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=2070')",
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-dark/80 via-dark/60 to-dark/90" />
-      </div>
 
       {/* Content */}
-      <div ref={contentRef} className="relative z-20 container mx-auto px-4 lg:px-8 text-center">
-        <h1
-          ref={titleRef}
-          className="text-4xl md:text-6xl lg:text-7xl font-serif font-black text-white mb-8 drop-shadow-2xl"
-          style={{ opacity: 0, textShadow: '0 4px 20px rgba(0, 0, 0, 0.8)' }}
-        >
-          Эксклюзивный портфель
-          <br />
-          <span className="text-gold-500">предложений</span>
-        </h1>
+      <div ref={contentRef} className="relative z-20 container mx-auto px-4 lg:px-8 text-center flex flex-col items-center">
+        {/* Logo */}
         <div 
-          ref={buttonsRef} 
-          className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+          ref={logoRef}
+          className="relative mb-8"
+          style={{ opacity: 0 }}
         >
-          <Link
-            href="/catalog"
-            className="bg-gold-500 text-dark px-8 py-4 rounded-lg font-bold text-lg hover:bg-gold-400 transition-all duration-300 flex items-center justify-center space-x-2 group glow-gold opacity-0 shadow-2xl"
-          >
-            <span>Недвижимости</span>
-            <ArrowRight className="group-hover:translate-x-1 transition-transform" size={20} />
-          </Link>
+          <div className="relative h-48 w-48 md:h-64 md:w-64 lg:h-80 lg:w-80 flex-shrink-0">
+            <Image
+              src="/logo.png"
+              alt="CROWN LINE PROPERTY"
+              fill
+              className="object-contain"
+              priority
+              onError={(e) => {
+                const target = e.target as HTMLImageElement
+                target.style.display = 'none'
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Tagline */}
+        <p
+          ref={taglineRef}
+          className="text-white font-serif text-lg md:text-xl lg:text-2xl tracking-widest mb-12 uppercase"
+          style={{ opacity: 0 }}
+        >
+          REAL ESTATE OF DISTINCTION
+        </p>
+
+        {/* Button */}
+        <div ref={buttonRef} style={{ opacity: 0 }}>
           <Link
             href="/contacts"
-            className="border-2 border-gold-500 text-gold-500 bg-dark/30 backdrop-blur-sm px-8 py-4 rounded-lg font-bold text-lg hover:bg-gold-500/20 transition-all duration-300 opacity-0 shadow-2xl"
+            className="inline-block border border-gold-500/50 bg-dark/40 backdrop-blur-sm text-white px-8 py-4 rounded-lg font-serif text-sm md:text-base lg:text-lg tracking-widest uppercase hover:bg-gold-500/10 hover:border-gold-500 transition-all duration-300"
           >
-            Подробности по заявке
+            PRIVATE INQUIRY
           </Link>
         </div>
       </div>

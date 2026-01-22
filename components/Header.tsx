@@ -11,6 +11,7 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
   const overlayRef = useRef<HTMLDivElement>(null)
+  const logoRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -19,6 +20,28 @@ export default function Header() {
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  useEffect(() => {
+    if (logoRef.current) {
+      if (isScrolled) {
+        // Плавное появление логотипа при скролле
+        gsap.to(logoRef.current, {
+          opacity: 1,
+          scale: 1,
+          duration: 0.5,
+          ease: 'power2.out',
+        })
+      } else {
+        // Плавное скрытие логотипа при возврате наверх
+        gsap.to(logoRef.current, {
+          opacity: 0,
+          scale: 0.8,
+          duration: 0.3,
+          ease: 'power2.in',
+        })
+      }
+    }
+  }, [isScrolled])
 
   useEffect(() => {
     if (isMenuOpen) {
@@ -82,9 +105,17 @@ export default function Header() {
           {/* Empty left side for balance */}
           <div className="flex-1"></div>
 
-          {/* Center Logo */}
-          <Link href="/" className="absolute left-1/2 flex items-center justify-center" style={{ transform: 'translate(-50%, 0.5px)' }}>
-            <div className="relative h-32 w-32 md:h-40 md:w-40 lg:h-44 lg:w-44 flex-shrink-0">
+          {/* Center Logo - появляется при скролле */}
+          <Link 
+            href="/" 
+            className="absolute left-1/2 flex items-center justify-center" 
+            style={{ transform: 'translate(-50%, 0.5px)' }}
+          >
+            <div 
+              ref={logoRef}
+              className="relative h-20 w-20 md:h-24 md:w-24 lg:h-28 lg:w-28 flex-shrink-0"
+              style={{ opacity: 0, transform: 'scale(0.8)' }}
+            >
               <Image
                 src="/logo.png"
                 alt="CROWN LINE PROPERTY"
