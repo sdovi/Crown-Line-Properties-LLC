@@ -48,14 +48,36 @@ export default function StrongCTA() {
         if (!response.ok) throw new Error('Failed to fetch countries')
         
         const data = await response.json()
-        setCountries(data.countries)
+        
+        // Сортируем страны: ОАЭ первый, остальные по алфавиту, Россия последняя
+        const sortedCountries = [...data.countries].sort((a: Country, b: Country) => {
+          // ОАЭ всегда первый
+          if (a.code === 'AE') return -1
+          if (b.code === 'AE') return 1
+          // Россия всегда последняя
+          if (a.code === 'RU') return 1
+          if (b.code === 'RU') return -1
+          // Остальные по алфавиту
+          return a.name.localeCompare(b.name, 'ru')
+        })
+        
+        // Явно перемещаем Россию в конец
+        const uaeCountry = sortedCountries.find((c: Country) => c.code === 'AE')
+        const russiaCountry = sortedCountries.find((c: Country) => c.code === 'RU')
+        const otherCountries = sortedCountries.filter((c: Country) => c.code !== 'AE' && c.code !== 'RU')
+        
+        const finalSorted: Country[] = []
+        if (uaeCountry) finalSorted.push(uaeCountry)
+        finalSorted.push(...otherCountries)
+        if (russiaCountry) finalSorted.push(russiaCountry)
+        
+        setCountries(finalSorted)
         
         // Устанавливаем ОАЭ по умолчанию
-        const uaeCountry = data.countries.find((c: Country) => c.code === 'AE')
         if (uaeCountry) {
           setSelectedCountry(uaeCountry)
-        } else if (data.countries.length > 0) {
-          setSelectedCountry(data.countries[0])
+        } else if (finalSorted.length > 0) {
+          setSelectedCountry(finalSorted[0])
         }
       } catch (error) {
         console.error('Error loading countries:', error)
