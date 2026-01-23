@@ -236,10 +236,10 @@ ${data.message ? `💬 Сообщение: ${data.message}` : ''}
         <div className="max-w-4xl mx-auto cta-content">
           <div className="text-center mb-12">
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif text-gold-500 mb-4">
-              Готовы начать?
+              Частное обращение
             </h2>
             <p className="text-xl text-white/70">
-              Оставьте заявку, и наш консультант свяжется с вами в ближайшее время
+              Для персонального рассмотрения запроса
             </p>
           </div>
 
@@ -415,12 +415,6 @@ ${data.message ? `💬 Сообщение: ${data.message}` : ''}
               </button>
             )}
 
-            <p className="text-white/50 text-sm text-center mt-6">
-              Или свяжитесь с нами напрямую:{' '}
-              <a href="tel:+971501234567" className="text-gold-500 hover:text-gold-400">
-                +971 50 123 45 67
-              </a>
-            </p>
           </form>
         </div>
       </div>

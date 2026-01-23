@@ -10,33 +10,33 @@ gsap.registerPlugin(ScrollTrigger)
 const advantages = [
   {
     icon: Crown,
-    title: 'Эксклюзивный доступ',
-    description: 'Доступ к объектам до их публикации на рынке',
+    title: 'Закрытый доступ к объектам',
+    description: 'Ранний доступ до выхода на открытый рынок',
   },
   {
     icon: Shield,
-    title: 'Полное сопровождение',
-    description: 'Юридическое сопровождение на всех этапах сделки',
+    title: 'Комплексное сопровождение сделки',
+    description: 'Юридическая и административная поддержка на каждом этапе',
   },
   {
     icon: Users,
-    title: 'Экспертиза рынка',
-    description: '20+ лет опыта по всему миру',
+    title: 'Международная экспертиза',
+    description: 'Более 20 лет практики на глобальных рынках недвижимости',
   },
   {
     icon: FileCheck,
-    title: 'Прозрачность',
-    description: 'Честные цены без скрытых комиссий',
+    title: 'Прозрачные условия сотрудничества',
+    description: 'Финансовая структура без скрытых начислений',
   },
   {
     icon: TrendingUp,
-    title: 'Инвестиционные консультации',
-    description: 'Помощь в выборе выгодных объектов для инвестиций',
+    title: 'Инвестиционное сопровождение',
+    description: 'Подбор активов с учётом стратегии и целей капитала',
   },
   {
     icon: Heart,
-    title: 'VIP-сервис',
-    description: 'Индивидуальный подход к каждому клиенту',
+    title: 'Персональное сопровождение',
+    description: 'Индивидуальная стратегия взаимодействия',
   },
 ]
 
@@ -83,10 +83,10 @@ export default function CompanyAdvantages() {
       <div className="container mx-auto px-4 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif text-gold-500 mb-4">
-            Преимущества работы с нами
+            Подход Crown Line Property
           </h2>
           <p className="text-xl text-white/70 max-w-2xl mx-auto">
-            Почему выбирают CROWN LINE PROPERTY
+            Принципы, определяющие наш уровень работы
           </p>
         </div>
 

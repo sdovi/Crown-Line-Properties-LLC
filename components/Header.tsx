@@ -21,6 +21,41 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  // Устанавливаем начальное состояние меню
+  useEffect(() => {
+    if (menuRef.current) {
+      const isMobile = window.innerWidth < 1024
+      if (isMobile) {
+        gsap.set(menuRef.current, { x: '-100%' })
+      } else {
+        gsap.set(menuRef.current, { opacity: 0, y: -10, x: 0 })
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isMenuOpen && menuRef.current && overlayRef.current) {
+        const isMobile = window.innerWidth < 1024
+        if (!isMobile) {
+          // На десктопе закрываем меню при клике вне его
+          const target = event.target as Node
+          if (menuRef.current && !menuRef.current.contains(target)) {
+            setIsMenuOpen(false)
+          }
+        }
+      }
+    }
+
+    if (isMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isMenuOpen])
+
   useEffect(() => {
     if (logoRef.current) {
       if (isScrolled) {
@@ -48,21 +83,35 @@ export default function Header() {
       // Небольшая задержка для обновления DOM
       const timer = setTimeout(() => {
         if (menuRef.current && overlayRef.current) {
-          // Устанавливаем начальное состояние
-          gsap.set(menuRef.current, { x: '-100%' })
-          gsap.set(overlayRef.current, { opacity: 0 })
+          const isMobile = window.innerWidth < 1024
           
-          // Анимация появления меню слева
-          gsap.to(menuRef.current, {
-            x: 0,
-            duration: 0.4,
-            ease: 'power3.out'
-          })
-          gsap.to(overlayRef.current, {
-            opacity: 1,
-            duration: 0.3
-          })
-          document.body.style.overflow = 'hidden'
+          if (isMobile) {
+            // Мобильная версия: меню слева
+            gsap.set(menuRef.current, { x: '-100%', clearProps: 'opacity,y' })
+            gsap.set(overlayRef.current, { opacity: 0 })
+            
+            gsap.to(menuRef.current, {
+              x: 0,
+              duration: 0.4,
+              ease: 'power3.out'
+            })
+            gsap.to(overlayRef.current, {
+              opacity: 1,
+              duration: 0.3
+            })
+            document.body.style.overflow = 'hidden'
+          } else {
+            // Десктоп версия: выпадающее меню справа
+            gsap.set(menuRef.current, { opacity: 0, y: -10, x: 0, clearProps: '' })
+            gsap.set(overlayRef.current, { opacity: 0 })
+            
+            gsap.to(menuRef.current, {
+              opacity: 1,
+              y: 0,
+              duration: 0.3,
+              ease: 'power3.out'
+            })
+          }
         }
       }, 10)
 
@@ -70,26 +119,37 @@ export default function Header() {
     } else {
       // Анимация скрытия меню
       if (menuRef.current && overlayRef.current) {
-        gsap.to(menuRef.current, {
-          x: '-100%',
-          duration: 0.3,
-          ease: 'power3.in'
-        })
-        gsap.to(overlayRef.current, {
-          opacity: 0,
-          duration: 0.2
-        })
-        document.body.style.overflow = ''
+        const isMobile = window.innerWidth < 1024
+        
+        if (isMobile) {
+          gsap.to(menuRef.current, {
+            x: '-100%',
+            duration: 0.3,
+            ease: 'power3.in'
+          })
+          gsap.to(overlayRef.current, {
+            opacity: 0,
+            duration: 0.2
+          })
+          document.body.style.overflow = ''
+        } else {
+          gsap.to(menuRef.current, {
+            opacity: 0,
+            y: -10,
+            duration: 0.2,
+            ease: 'power3.in'
+          })
+        }
       }
     }
   }, [isMenuOpen])
 
   const navItems = [
     { href: '/', label: 'Главная' },
-    { href: '/catalog', label: 'Каталог' },
-    { href: '/about', label: 'О компании' },
-    { href: '/investors', label: 'Инвесторам' },
+    { href: '/catalog', label: 'Коллекция' },
+    { href: '/investors', label: 'Инвестиции' },
     { href: '/contacts', label: 'Контакты' },
+    { href: '/catalog?type=exclusives', label: 'Эксклюзив' },
   ]
 
   return (
@@ -146,24 +206,23 @@ export default function Header() {
         {/* Menu Overlay - Works on all screens */}
         {isMenuOpen && (
           <>
-            {/* Overlay */}
+            {/* Overlay - только на мобильных */}
             <div
               ref={overlayRef}
-              className="fixed inset-0 bg-black/60 z-40"
+              className="lg:hidden fixed inset-0 bg-black/60 z-40"
               onClick={() => setIsMenuOpen(false)}
               style={{ opacity: 0 }}
             />
             
-            {/* Side Menu */}
+            {/* Side Menu - Mobile / Dropdown - Desktop */}
             <div
               ref={menuRef}
-              className="fixed top-0 left-0 h-full w-80 max-w-[85vw] z-50"
+              className="lg:absolute lg:top-full lg:right-0 lg:mt-2 lg:w-80 lg:max-w-none lg:h-auto fixed top-0 left-0 h-full w-80 max-w-[85vw] z-50 lg:rounded-lg lg:shadow-2xl"
               style={{
                 background: 'linear-gradient(180deg, #020202 0%, #2b2f38 100%)',
-                transform: 'translateX(-100%)',
               }}
             >
-              <div className="flex flex-col h-full p-6">
+              <div className="flex flex-col h-full lg:h-auto p-6">
                 {/* Close Button */}
                 <div className="flex justify-end mb-8">
                   <button
@@ -176,7 +235,7 @@ export default function Header() {
                 </div>
 
                 {/* Menu Items */}
-                <nav className="flex flex-col space-y-4 flex-1">
+                <nav className="flex flex-col space-y-4 flex-1 lg:flex-none">
                   {navItems.map((item) => (
                     <Link
                       key={item.href}
@@ -192,11 +251,11 @@ export default function Header() {
                 {/* Contact Button */}
                 <Link
                   href="/contacts"
-                  className="mt-auto bg-gold-500 text-dark px-6 py-4 rounded-lg font-bold text-center flex items-center justify-center space-x-2 hover:bg-gold-400 transition-colors"
+                  className="mt-auto lg:mt-4 bg-gold-500 text-dark px-6 py-4 rounded-lg font-bold text-center flex items-center justify-center space-x-2 hover:bg-gold-400 transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <Phone size={20} />
-                  <span>Консультация</span>
+                  <span>Связаться</span>
                 </Link>
               </div>
             </div>

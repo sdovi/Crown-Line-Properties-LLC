@@ -20,7 +20,7 @@ export default function Home() {
       <PropertyCategories />
       <FeaturedProperties />
       <InvestmentOpportunities />
-      <PropertyGeography />
+      {/* <PropertyGeography /> */}
       <CompanyAdvantages />
       {/* <WorkProcess /> */}
       {/* <ClientTestimonials /> */}

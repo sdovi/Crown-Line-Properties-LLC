@@ -10,63 +10,63 @@ gsap.registerPlugin(ScrollTrigger)
 
 const mainCategories = [
   {
-    id: 'rental-residential',
-    title: 'Аренда жилой недвижимости',
-    subtitle: 'Квартиры, Виллы, Таунхаусы',
-    image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2075',
-    href: '/catalog?type=rental&category=residential',
-    count: 124,
+    id: 'exclusives',
+    title: 'Эксклюзив',
+    subtitle: 'Закрытая коллекция объектов\n(доступ по индивидуальному запросу)',
+    image: '/photo_2026-01-23_09-41-33.jpg',
+    href: '/catalog?type=exclusives',
+    count: 45,
   },
   {
-    id: 'rental-commercial',
-    title: 'Аренда коммерческой недвижимости',
-    subtitle: 'Офисы, Торговые площади, Склады',
-    image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2069',
-    href: '/catalog?type=rental&category=commercial',
-    count: 87,
+    id: 'land',
+    title: 'Земельные участки',
+    subtitle: 'Инвестиционные земельные активы\n(под застройку и развитие)',
+    image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=2059',
+    href: '/catalog?type=land',
+    count: 67,
+  },
+  {
+    id: 'off-plan',
+    title: 'На стадии застройки',
+    subtitle: 'Проекты на этапе девелопмента\n(off-plan residences)',
+    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070',
+    href: '/catalog?type=off-plan',
+    count: 89,
   },
   {
     id: 'sale-residential',
-    title: 'Продажа жилой недвижимости',
-    subtitle: 'Новостройки, Вторичный рынок',
-    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070',
+    title: 'Готовая жилая недвижимость',
+    subtitle: 'Завершённые жилые резиденции\n(готовые к заселению объекты)',
+    image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2075',
     href: '/catalog?type=sale&category=residential',
     count: 156,
-  },
-  {
-    id: 'sale-commercial',
-    title: 'Продажа коммерческой недвижимости',
-    subtitle: 'Офисы, Торговые центры, Промышленные объекты',
-    image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070',
-    href: '/catalog?type=sale&category=commercial',
-    count: 92,
   },
 ]
 
 const additionalCategories = [
   {
-    id: 'exclusives',
-    title: 'Эксклюзивы',
-    subtitle: 'Уникальные объекты премиум класса',
-    image: 'https://images.unsplash.com/photo-1613977257363-707ba9348227?q=80&w=2070',
-    href: '/catalog?type=exclusives',
-    count: 45,
+    id: 'sale-commercial',
+    title: 'Коммерческая недвижимость',
+    subtitle: 'Коммерческие активы\n(retail · offices · mixed-use)',
+    image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070',
+    href: '/catalog?type=sale&category=commercial',
+    count: 92,
   },
   {
-    id: 'hotels',
-    title: 'Отели',
-    subtitle: 'Готовый бизнес в сфере гостеприимства',
-    image: 'https://images.unsplash.com/photo-1564501049412-61c2a3083791?q=80&w=2089',
-    href: '/catalog?type=hotels',
-    count: 28,
+    id: 'rental-residential',
+    title: 'Аренда жилой недвижимости',
+    subtitle: 'Аренда частных резиденций\n(long & short term)',
+    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070',
+    href: '/catalog?type=rental&category=residential',
+    count: 124,
   },
   {
-    id: 'land',
-    title: 'Земельные участки',
-    subtitle: 'Продажа земельных участков',
-    image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=2059',
-    href: '/catalog?type=land',
-    count: 67,
+    id: 'rental-commercial',
+    title: 'Аренда коммерции',
+    subtitle: 'Аренда коммерческих пространств\n(premium business locations)',
+    image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2069',
+    href: '/catalog?type=rental&category=commercial',
+    count: 87,
   },
 ]
 
@@ -146,9 +146,6 @@ export default function PropertyCategories() {
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif text-gold-500 mb-4">
             Категории недвижимости
           </h2>
-          <p className="text-xl text-white/70 max-w-2xl mx-auto">
-            Выберите тип недвижимости, который вас интересует
-          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
@@ -177,10 +174,9 @@ export default function PropertyCategories() {
                   <h3 className="text-3xl lg:text-4xl font-serif text-white mb-3 group-hover:text-gold-500 transition-colors">
                     {category.title}
                   </h3>
-                  <p className="text-white/80 mb-6">{category.subtitle}</p>
+                  {category.subtitle && <p className="text-white/80 mb-6 whitespace-pre-line">{category.subtitle}</p>}
                   <div className="flex items-center text-gold-500 font-semibold group-hover:translate-x-2 transition-transform duration-300">
-                    <span>Подробнее</span>
-                    <ArrowRight className="ml-2" size={20} />
+                    <ArrowRight size={20} />
                   </div>
                 </div>
               </div>
@@ -219,7 +215,7 @@ export default function PropertyCategories() {
                     <h3 className="text-3xl lg:text-4xl font-serif text-white mb-3 group-hover:text-gold-500 transition-colors">
                       {category.title}
                     </h3>
-                    <p className="text-white/80 mb-6">{category.subtitle}</p>
+                    {category.subtitle && <p className="text-white/80 mb-6 whitespace-pre-line">{category.subtitle}</p>}
                     <div className="flex items-center text-gold-500 font-semibold group-hover:translate-x-2 transition-transform duration-300">
                       <span>Подробнее</span>
                       <ArrowRight className="ml-2" size={20} />

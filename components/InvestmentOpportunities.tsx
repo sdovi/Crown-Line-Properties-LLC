@@ -50,10 +50,10 @@ export default function InvestmentOpportunities() {
       <div className="container mx-auto px-4 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif text-gold-500 mb-4">
-            Инвестиционные возможности
+            Инвестиционный портфель
           </h2>
           <p className="text-xl text-white/70 max-w-2xl mx-auto">
-            Выгодные инвестиции в недвижимость Дубая с высокой доходностью
+            Недвижимость с долгосрочным потенциалом
           </p>
         </div>
 
@@ -62,11 +62,8 @@ export default function InvestmentOpportunities() {
             <div className="bg-gold-500/10 w-16 h-16 rounded-full flex items-center justify-center mb-6">
               <TrendingUp className="text-gold-500" size={32} />
             </div>
-            <h3 className="text-2xl font-serif text-white mb-4">Высокая доходность</h3>
-            <p className="text-white/70 mb-6">
-              Средняя доходность от аренды составляет 8-12% годовых
-            </p>
-            <div className="text-4xl font-serif text-gold-500">8-12%</div>
+            <h3 className="text-2xl font-serif text-white mb-4">Потенциал арендного дохода</h3>
+            <div className="text-4xl font-serif text-gold-500 mb-2">7–12%</div>
             <div className="text-white/60 text-sm">годовых</div>
           </div>
 
@@ -74,24 +71,20 @@ export default function InvestmentOpportunities() {
             <div className="bg-gold-500/10 w-16 h-16 rounded-full flex items-center justify-center mb-6">
               <DollarSign className="text-gold-500" size={32} />
             </div>
-            <h3 className="text-2xl font-serif text-white mb-4">Рост цен</h3>
-            <p className="text-white/70 mb-6">
-              Стабильный рост стоимости недвижимости в Дубае
+            <h3 className="text-2xl font-serif text-white mb-4">Потенциал роста капитала</h3>
+            <p className="text-white/70">
+              Долгосрочная динамика рынка недвижимости Дубая
             </p>
-            <div className="text-4xl font-serif text-gold-500">+15%</div>
-            <div className="text-white/60 text-sm">в год</div>
           </div>
 
           <div className="investment-card bg-dark-lighter rounded-2xl p-8 border border-gold-500/20 hover:border-gold-500/50 transition-colors">
             <div className="bg-gold-500/10 w-16 h-16 rounded-full flex items-center justify-center mb-6">
               <BarChart3 className="text-gold-500" size={32} />
             </div>
-            <h3 className="text-2xl font-serif text-white mb-4">Стабильность</h3>
-            <p className="text-white/70 mb-6">
-              Надежный рынок с прозрачным законодательством
+            <h3 className="text-2xl font-serif text-white mb-4">Институциональная стабильность</h3>
+            <p className="text-white/70">
+              Прозрачная правовая среда и зрелый рынок недвижимости
             </p>
-            <div className="text-4xl font-serif text-gold-500">100%</div>
-            <div className="text-white/60 text-sm">безопасность</div>
           </div>
         </div>
       </div>

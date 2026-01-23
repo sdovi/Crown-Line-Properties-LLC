@@ -123,10 +123,10 @@ export default function FeaturedProperties() {
       <div className="container mx-auto px-4 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif text-gold-500 mb-4">
-            Рекомендуемые объекты
+            Избранная коллекция
           </h2>
           <p className="text-xl text-white/70 max-w-2xl mx-auto mb-8">
-            Премиальная недвижимость в лучших районах Дубая
+            Резиденции в ключевых локациях Дубая
           </p>
 
           {/* Filters */}
