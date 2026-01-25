@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import Image from 'next/image'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger'
 import { Star, Quote } from 'lucide-react'
@@ -38,9 +39,10 @@ export default function ClientTestimonials() {
   const sectionRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (!sectionRef.current) return
+    const currentSectionRef = sectionRef.current
+    if (!currentSectionRef) return
 
-    const cards = sectionRef.current.querySelectorAll('.testimonial-card')
+    const cards = currentSectionRef.querySelectorAll('.testimonial-card')
     if (cards.length === 0) return
 
     const ctx = gsap.context(() => {
@@ -60,12 +62,12 @@ export default function ClientTestimonials() {
           ease: 'power3.out',
         })
       })
-    }, sectionRef)
+    }, currentSectionRef)
 
     return () => {
       ctx.revert()
       ScrollTrigger.getAll().forEach((trigger) => {
-        if (trigger.vars.trigger && sectionRef.current?.contains(trigger.vars.trigger as Element)) {
+        if (trigger.vars.trigger && currentSectionRef.contains(trigger.vars.trigger as Element)) {
           trigger.kill()
         }
       })
@@ -102,10 +104,13 @@ export default function ClientTestimonials() {
               </div>
               <p className="text-white/80 mb-6 italic">{testimonial.text}</p>
               <div className="flex items-center">
-                <img
+                <Image
                   src={testimonial.avatar}
                   alt={testimonial.name}
-                  className="w-12 h-12 rounded-full border-2 border-gold-500 mr-4"
+                  width={48}
+                  height={48}
+                  className="rounded-full border-2 border-gold-500 mr-4"
+                  unoptimized
                 />
                 <div>
                   <div className="font-semibold text-white">{testimonial.name}</div>

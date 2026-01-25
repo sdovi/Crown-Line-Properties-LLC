@@ -40,9 +40,10 @@ export default function FAQ() {
   const sectionRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (!sectionRef.current) return
+    const currentSectionRef = sectionRef.current
+    if (!currentSectionRef) return
 
-    const items = sectionRef.current.querySelectorAll('.faq-item')
+    const items = currentSectionRef.querySelectorAll('.faq-item')
     if (items.length === 0) return
 
     const ctx = gsap.context(() => {
@@ -62,12 +63,12 @@ export default function FAQ() {
           ease: 'power3.out',
         })
       })
-    }, sectionRef)
+    }, currentSectionRef)
 
     return () => {
       ctx.revert()
       ScrollTrigger.getAll().forEach((trigger) => {
-        if (trigger.vars.trigger && sectionRef.current?.contains(trigger.vars.trigger as Element)) {
+        if (trigger.vars.trigger && currentSectionRef.contains(trigger.vars.trigger as Element)) {
           trigger.kill()
         }
       })

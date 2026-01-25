@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Property, getProperties, addProperty, updateProperty, deleteProperty } from '@/lib/properties'
 import { ContactInfo, getContacts, saveContacts } from '@/lib/contacts'
 import { Plus, Edit, Trash2, Save, X, Home, MapPin, DollarSign, Square, Bed, Image as ImageIcon, ArrowLeft, Phone, Mail, Facebook, Instagram, Twitter, Settings, Upload } from 'lucide-react'
@@ -470,10 +471,12 @@ export default function AdminPanel() {
                             key={idx}
                             className="relative group aspect-square rounded-lg overflow-hidden border border-gold-500/20"
                           >
-                            <img
+                            <Image
                               src={img}
                               alt={`Preview ${idx + 1}`}
-                              className="w-full h-full object-cover"
+                              fill
+                              className="object-cover"
+                              unoptimized
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                             {idx === 3 && property.images.length > 4 && (
@@ -812,10 +815,12 @@ function PropertyForm({
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             {(formData.images || []).map((img, idx) => (
               <div key={idx} className="relative group aspect-square rounded-lg overflow-hidden border border-gold-500/30">
-                <img
+                <Image
                   src={img}
                   alt={`Image ${idx + 1}`}
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
+                  unoptimized
                 />
                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                   <button

@@ -11,9 +11,10 @@ export default function InvestmentOpportunities() {
   const sectionRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (!sectionRef.current) return
+    const currentSectionRef = sectionRef.current
+    if (!currentSectionRef) return
 
-    const cards = sectionRef.current.querySelectorAll('.investment-card')
+    const cards = currentSectionRef.querySelectorAll('.investment-card')
     if (cards.length === 0) return
 
     const ctx = gsap.context(() => {
@@ -33,12 +34,12 @@ export default function InvestmentOpportunities() {
           ease: 'power3.out',
         })
       })
-    }, sectionRef)
+    }, currentSectionRef)
 
     return () => {
       ctx.revert()
       ScrollTrigger.getAll().forEach((trigger) => {
-        if (trigger.vars.trigger && sectionRef.current?.contains(trigger.vars.trigger as Element)) {
+        if (trigger.vars.trigger && currentSectionRef.contains(trigger.vars.trigger as Element)) {
           trigger.kill()
         }
       })

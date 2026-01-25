@@ -23,15 +23,15 @@ export default function FeaturedProperties() {
       setProperties(props)
       
       // Инициализация индексов изображений
-      const initialIndexes: Record<number, number> = {}
-      props.forEach((prop) => {
-        if (!(prop.id in activeImageIndex)) {
-          initialIndexes[prop.id] = 0
-        }
+      setActiveImageIndex((prev) => {
+        const initialIndexes: Record<number, number> = { ...prev }
+        props.forEach((prop) => {
+          if (!(prop.id in initialIndexes)) {
+            initialIndexes[prop.id] = 0
+          }
+        })
+        return initialIndexes
       })
-      if (Object.keys(initialIndexes).length > 0) {
-        setActiveImageIndex((prev) => ({ ...prev, ...initialIndexes }))
-      }
     }
 
     loadProperties()
@@ -138,7 +138,8 @@ export default function FeaturedProperties() {
   }
 
   useEffect(() => {
-    if (!sectionRef.current) return
+    const currentSectionRef = sectionRef.current
+    if (!currentSectionRef) return
 
     const cards = cardsRef.current.filter(Boolean)
     if (cards.length === 0) return
@@ -162,12 +163,12 @@ export default function FeaturedProperties() {
           })
         }
       })
-    }, sectionRef)
+    }, currentSectionRef)
 
     return () => {
       ctx.revert()
       ScrollTrigger.getAll().forEach((trigger) => {
-        if (trigger.vars.trigger && sectionRef.current?.contains(trigger.vars.trigger as Element)) {
+        if (trigger.vars.trigger && currentSectionRef.contains(trigger.vars.trigger as Element)) {
           trigger.kill()
         }
       })

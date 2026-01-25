@@ -19,9 +19,10 @@ export default function PartnerLogos() {
   const sectionRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (!sectionRef.current) return
+    const currentSectionRef = sectionRef.current
+    if (!currentSectionRef) return
 
-    const logos = sectionRef.current.querySelectorAll('.partner-logo')
+    const logos = currentSectionRef.querySelectorAll('.partner-logo')
     if (logos.length === 0) return
 
     const ctx = gsap.context(() => {
@@ -41,12 +42,12 @@ export default function PartnerLogos() {
           ease: 'power3.out',
         })
       })
-    }, sectionRef)
+    }, currentSectionRef)
 
     return () => {
       ctx.revert()
       ScrollTrigger.getAll().forEach((trigger) => {
-        if (trigger.vars.trigger && sectionRef.current?.contains(trigger.vars.trigger as Element)) {
+        if (trigger.vars.trigger && currentSectionRef.contains(trigger.vars.trigger as Element)) {
           trigger.kill()
         }
       })
