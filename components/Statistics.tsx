@@ -18,13 +18,14 @@ export default function Statistics() {
   const [countedValues, setCountedValues] = useState(stats.map(() => 0))
 
   useEffect(() => {
-    if (!sectionRef.current) return
+    const currentSectionRef = sectionRef.current
+    if (!currentSectionRef) return
 
     let hasAnimated = false
 
     const ctx = gsap.context(() => {
       ScrollTrigger.create({
-        trigger: sectionRef.current,
+        trigger: currentSectionRef,
         start: 'top 80%',
         once: true,
         onEnter: () => {
@@ -49,12 +50,12 @@ export default function Statistics() {
           })
         },
       })
-    }, sectionRef)
+    }, currentSectionRef)
 
     return () => {
       ctx.revert()
       ScrollTrigger.getAll().forEach((trigger) => {
-        if (trigger.vars.trigger === sectionRef.current) {
+        if (trigger.vars.trigger === currentSectionRef) {
           trigger.kill()
         }
       })

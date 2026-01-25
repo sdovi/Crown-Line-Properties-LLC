@@ -20,9 +20,10 @@ export default function PropertyGeography() {
   const sectionRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (!sectionRef.current) return
+    const currentSectionRef = sectionRef.current
+    if (!currentSectionRef) return
 
-    const cards = sectionRef.current.querySelectorAll('.district-card')
+    const cards = currentSectionRef.querySelectorAll('.district-card')
     if (cards.length === 0) return
 
     const ctx = gsap.context(() => {
@@ -42,12 +43,12 @@ export default function PropertyGeography() {
           ease: 'power3.out',
         })
       })
-    }, sectionRef)
+    }, currentSectionRef)
 
     return () => {
       ctx.revert()
       ScrollTrigger.getAll().forEach((trigger) => {
-        if (trigger.vars.trigger && sectionRef.current?.contains(trigger.vars.trigger as Element)) {
+        if (trigger.vars.trigger && currentSectionRef.contains(trigger.vars.trigger as Element)) {
           trigger.kill()
         }
       })

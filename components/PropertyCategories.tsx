@@ -79,7 +79,8 @@ export default function PropertyCategories() {
   const additionalContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (!sectionRef.current) return
+    const currentSectionRef = sectionRef.current
+    if (!currentSectionRef) return
 
     const cards = cardsRef.current.filter(Boolean)
     if (cards.length === 0) return
@@ -103,12 +104,12 @@ export default function PropertyCategories() {
           })
         }
       })
-    }, sectionRef)
+    }, currentSectionRef)
 
     return () => {
       ctx.revert()
       ScrollTrigger.getAll().forEach((trigger) => {
-        if (trigger.vars.trigger && sectionRef.current?.contains(trigger.vars.trigger as Element)) {
+        if (trigger.vars.trigger && currentSectionRef.contains(trigger.vars.trigger as Element)) {
           trigger.kill()
         }
       })
