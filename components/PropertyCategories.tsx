@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger'
 import { ArrowRight, ChevronDown } from 'lucide-react'
@@ -13,7 +14,7 @@ const mainCategories = [
     id: 'exclusives',
     title: 'Эксклюзив',
     subtitle: 'Закрытая коллекция объектов\n(доступ по индивидуальному запросу)',
-    image: '/photo_2026-01-23_09-41-33.jpg',
+    image: '/ChatGPT Image 25 янв. 2026 г., 17_49_32.png',
     href: '/catalog?type=exclusives',
     count: 45,
   },
@@ -168,6 +169,21 @@ export default function PropertyCategories() {
               <div className="absolute inset-0 bg-gradient-to-t from-dark via-dark/60 to-transparent" />
               <div className="absolute inset-0 bg-gold-500/0 group-hover:bg-gold-500/10 transition-colors duration-300" />
 
+              {/* Logo for Exclusives card */}
+              {category.id === 'exclusives' && (
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
+                  <div className="relative h-32 w-32 md:h-40 md:w-40 lg:h-48 lg:w-48">
+                    <Image
+                      src="/logo.png"
+                      alt="CROWN LINE PROPERTY"
+                      fill
+                      className="object-contain drop-shadow-2xl"
+                      priority
+                    />
+                  </div>
+                </div>
+              )}
+
               {/* Content */}
               <div className="absolute inset-0 flex flex-col justify-end p-8 lg:p-12">
                 <div className="relative z-10">
@@ -217,8 +233,7 @@ export default function PropertyCategories() {
                     </h3>
                     {category.subtitle && <p className="text-white/80 mb-6 whitespace-pre-line">{category.subtitle}</p>}
                     <div className="flex items-center text-gold-500 font-semibold group-hover:translate-x-2 transition-transform duration-300">
-                      <span>Подробнее</span>
-                      <ArrowRight className="ml-2" size={20} />
+                      <ArrowRight size={20} />
                     </div>
                   </div>
                 </div>

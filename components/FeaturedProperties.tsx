@@ -4,82 +4,138 @@ import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger'
-import { MapPin, Bed, Square } from 'lucide-react'
+import { MapPin, Bed, Square, Share2, Check } from 'lucide-react'
+import { Property, getProperties } from '@/lib/properties'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const properties = [
-  {
-    id: 1,
-    title: 'Пентхаус с видом на Burj Khalifa',
-    location: 'Downtown Dubai',
-    price: 'AED 15,000,000',
-    area: '450 м²',
-    bedrooms: 4,
-    image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=2053',
-    type: 'sale',
-  },
-  {
-    id: 2,
-    title: 'Вилла на Palm Jumeirah',
-    location: 'Palm Jumeirah',
-    price: 'AED 25,000/мес',
-    area: '800 м²',
-    bedrooms: 6,
-    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070',
-    type: 'rental',
-  },
-  {
-    id: 3,
-    title: 'Апартаменты в Dubai Marina',
-    location: 'Dubai Marina',
-    price: 'AED 8,500,000',
-    area: '180 м²',
-    bedrooms: 2,
-    image: 'https://images.unsplash.com/photo-1600607687644-c7171b42498b?q=80&w=2027',
-    type: 'sale',
-  },
-  {
-    id: 4,
-    title: 'Офис в Business Bay',
-    location: 'Business Bay',
-    price: 'AED 120,000/мес',
-    area: '500 м²',
-    bedrooms: 0,
-    image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2069',
-    type: 'rental',
-  },
-  {
-    id: 5,
-    title: 'Таунхаус в Arabian Ranches',
-    location: 'Arabian Ranches',
-    price: 'AED 4,200,000',
-    area: '320 м²',
-    bedrooms: 3,
-    image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2075',
-    type: 'sale',
-  },
-  {
-    id: 6,
-    title: 'Пентхаус в Jumeirah',
-    location: 'Jumeirah',
-    price: 'AED 18,000/мес',
-    area: '280 м²',
-    bedrooms: 3,
-    image: 'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?q=80&w=2070',
-    type: 'rental',
-  },
-]
-
 export default function FeaturedProperties() {
   const [activeFilter, setActiveFilter] = useState<'all' | 'sale' | 'rental'>('all')
+  const [properties, setProperties] = useState<Property[]>([])
+  const [activeImageIndex, setActiveImageIndex] = useState<Record<number, number>>({})
+  const [copiedPropertyId, setCopiedPropertyId] = useState<number | null>(null)
   const sectionRef = useRef<HTMLDivElement>(null)
   const cardsRef = useRef<(HTMLAnchorElement | null)[]>([])
+
+  useEffect(() => {
+    const loadProperties = () => {
+      const props = getProperties()
+      setProperties(props)
+      
+      // Инициализация индексов изображений
+      const initialIndexes: Record<number, number> = {}
+      props.forEach((prop) => {
+        if (!(prop.id in activeImageIndex)) {
+          initialIndexes[prop.id] = 0
+        }
+      })
+      if (Object.keys(initialIndexes).length > 0) {
+        setActiveImageIndex((prev) => ({ ...prev, ...initialIndexes }))
+      }
+    }
+
+    loadProperties()
+
+    // Слушаем изменения в localStorage
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'featured_properties') {
+        loadProperties()
+      }
+    }
+
+    // Слушаем кастомное событие для обновления в той же вкладке
+    const handleCustomStorageChange = () => {
+      loadProperties()
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    window.addEventListener('propertiesUpdated', handleCustomStorageChange)
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('propertiesUpdated', handleCustomStorageChange)
+    }
+  }, [])
 
   const filteredProperties =
     activeFilter === 'all'
       ? properties
       : properties.filter((p) => p.type === activeFilter)
+
+  const handleImageChange = (propertyId: number, direction: 'next' | 'prev') => {
+    const property = properties.find((p) => p.id === propertyId)
+    if (!property || property.images.length === 0) return
+
+    const currentIndex = activeImageIndex[propertyId] || 0
+    let newIndex: number
+
+    if (direction === 'next') {
+      newIndex = currentIndex === property.images.length - 1 ? 0 : currentIndex + 1
+    } else {
+      newIndex = currentIndex === 0 ? property.images.length - 1 : currentIndex - 1
+    }
+
+    setActiveImageIndex({
+      ...activeImageIndex,
+      [propertyId]: newIndex,
+    })
+  }
+
+  const handleShare = async (e: React.MouseEvent, propertyId: number) => {
+    e.preventDefault()
+    e.stopPropagation()
+    
+    const propertyUrl = `${window.location.origin}/property/${propertyId}`
+    
+    const copyToClipboard = async () => {
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(propertyUrl)
+        } else {
+          // Fallback для старых браузеров
+          const textArea = document.createElement('textarea')
+          textArea.value = propertyUrl
+          textArea.style.position = 'fixed'
+          textArea.style.left = '-999999px'
+          document.body.appendChild(textArea)
+          textArea.focus()
+          textArea.select()
+          document.execCommand('copy')
+          document.body.removeChild(textArea)
+        }
+        setCopiedPropertyId(propertyId)
+        setTimeout(() => setCopiedPropertyId(null), 2000)
+      } catch (error) {
+        console.error('Failed to copy:', error)
+      }
+    }
+    
+    try {
+      // Пытаемся использовать Web Share API, если доступен (в основном на мобильных)
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: properties.find(p => p.id === propertyId)?.title || 'Недвижимость',
+            url: propertyUrl,
+          })
+          // Если шаринг успешен, не показываем состояние "скопировано"
+          return
+        } catch (shareError) {
+          // Если пользователь отменил шаринг (AbortError), копируем в буфер
+          if (shareError instanceof Error && shareError.name === 'AbortError') {
+            return
+          }
+          // При другой ошибке пробуем скопировать
+          await copyToClipboard()
+        }
+      } else {
+        // Если Web Share API недоступен, просто копируем
+        await copyToClipboard()
+      }
+    } catch (error) {
+      console.error('Share error:', error)
+    }
+  }
 
   useEffect(() => {
     if (!sectionRef.current) return
@@ -152,62 +208,172 @@ export default function FeaturedProperties() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredProperties.map((property, index) => (
-            <Link
-              key={property.id}
-              href={`/property/${property.id}`}
-              ref={(el) => {
-                if (el) cardsRef.current[index] = el
-              }}
-              className="group bg-dark-lighter rounded-2xl overflow-hidden hover:bg-dark-light transition-all duration-300"
-            >
-              {/* Image */}
-              <div className="relative h-64 overflow-hidden">
-                <div
-                  className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
-                  style={{ backgroundImage: `url(${property.image})` }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-dark via-transparent to-transparent" />
-                <div className="absolute top-4 right-4">
-                  <span
-                    className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                      property.type === 'sale'
-                        ? 'bg-gold-500 text-dark'
-                        : 'bg-white/20 text-white backdrop-blur-sm'
-                    }`}
-                  >
-                    {property.type === 'sale' ? 'Продажа' : 'Аренда'}
-                  </span>
-                </div>
-              </div>
+          {filteredProperties.map((property, index) => {
+            const currentImageIndex = activeImageIndex[property.id] || 0
+            const images = property.images.length > 0 ? property.images : ['https://via.placeholder.com/400x300?text=No+Image']
+            const hasMultipleImages = images.length > 1
 
-              {/* Content */}
-              <div className="p-6">
-                <h3 className="text-xl font-serif text-white mb-2 group-hover:text-gold-500 transition-colors">
-                  {property.title}
-                </h3>
-                <div className="flex items-center text-white/60 text-sm mb-4">
-                  <MapPin size={16} className="mr-1" />
-                  {property.location}
-                </div>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="text-2xl font-serif text-gold-500">
-                    {property.price}
-                  </div>
-                  {property.bedrooms > 0 && (
-                    <div className="flex items-center text-white/70">
-                      <Bed size={18} className="mr-1" />
-                      <span>{property.bedrooms}</span>
+            return (
+              <div
+                key={property.id}
+                ref={(el) => {
+                  if (el) cardsRef.current[index] = el as HTMLAnchorElement
+                }}
+                className="group bg-dark-lighter rounded-2xl overflow-hidden hover:bg-dark-light transition-all duration-300"
+              >
+                <Link href={`/property/${property.id}`} className="block">
+                  {/* Image Slider */}
+                  <div className="relative h-64 overflow-hidden">
+                    <div className="relative w-full h-full">
+                      {images.map((img, imgIndex) => (
+                        <div
+                          key={imgIndex}
+                          className={`absolute inset-0 transition-opacity duration-500 ${
+                            imgIndex === currentImageIndex ? 'opacity-100' : 'opacity-0'
+                          }`}
+                        >
+                          <div
+                            className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
+                            style={{ backgroundImage: `url(${img})` }}
+                          />
+                        </div>
+                      ))}
                     </div>
-                  )}
-                </div>
-                <div className="flex items-center text-white/60 text-sm">
-                  <Square size={16} className="mr-1" />
-                  {property.area}
-                </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-dark via-transparent to-transparent" />
+                    
+                    {/* Navigation Buttons */}
+                    {hasMultipleImages && (
+                      <>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault()
+                            handleImageChange(property.id, 'prev')
+                          }}
+                          className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all opacity-0 group-hover:opacity-100"
+                          aria-label="Previous image"
+                        >
+                          ←
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault()
+                            handleImageChange(property.id, 'next')
+                          }}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all opacity-0 group-hover:opacity-100"
+                          aria-label="Next image"
+                        >
+                          →
+                        </button>
+                      </>
+                    )}
+
+                    {/* Image Indicators */}
+                    {hasMultipleImages && (
+                      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+                        {images.map((_, imgIndex) => (
+                          <button
+                            key={imgIndex}
+                            onClick={(e) => {
+                              e.preventDefault()
+                              setActiveImageIndex({
+                                ...activeImageIndex,
+                                [property.id]: imgIndex,
+                              })
+                            }}
+                            className={`w-2 h-2 rounded-full transition-all ${
+                              imgIndex === currentImageIndex
+                                ? 'bg-gold-500 w-6'
+                                : 'bg-white/40 hover:bg-white/60'
+                            }`}
+                            aria-label={`Go to image ${imgIndex + 1}`}
+                          />
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Type Badge */}
+                    <div className="absolute top-4 right-4">
+                      <span
+                        className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                          property.type === 'sale'
+                            ? 'bg-gold-500 text-dark'
+                            : 'bg-white/20 text-white backdrop-blur-sm'
+                        }`}
+                      >
+                        {property.type === 'sale' ? 'Продажа' : 'Аренда'}
+                      </span>
+                    </div>
+
+                    {/* Photo Count Badge */}
+                    {hasMultipleImages && images.length > 1 && (
+                      <div className="absolute top-4 left-4">
+                        <div className="px-2 py-1 bg-black/50 backdrop-blur-sm rounded text-white text-xs font-semibold">
+                          {images.length} фото
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Content */}
+                  <div className="p-6">
+                    <div className="flex items-start justify-between mb-2 gap-2">
+                      <h3 className="text-xl font-serif text-white group-hover:text-gold-500 transition-colors flex-1">
+                        {property.title}
+                      </h3>
+                      <button
+                        onClick={(e) => handleShare(e, property.id)}
+                        className="relative ml-2 p-2 hover:bg-gold-500/10 rounded-lg transition-all duration-300 group/share flex-shrink-0"
+                        aria-label={copiedPropertyId === property.id ? 'Ссылка скопирована' : 'Поделиться'}
+                        title={copiedPropertyId === property.id ? 'Ссылка скопирована' : 'Поделиться'}
+                      >
+                        {copiedPropertyId === property.id ? (
+                          <>
+                            <Check size={18} className="text-gold-500 animate-in fade-in zoom-in duration-200" />
+                            <span className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-gold-500 text-dark text-xs font-semibold rounded whitespace-nowrap opacity-0 group-hover/share:opacity-100 transition-opacity pointer-events-none">
+                              Скопировано!
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <Share2 size={18} className="text-white/60 group-hover/share:text-gold-500 transition-colors" />
+                            <span className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-dark-lighter border border-gold-500/30 text-white text-xs font-semibold rounded whitespace-nowrap opacity-0 group-hover/share:opacity-100 transition-opacity pointer-events-none">
+                              Поделиться
+                            </span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                    <div className="flex items-center text-white/60 text-sm mb-4">
+                      <MapPin size={16} className="mr-1" />
+                      {property.location}
+                    </div>
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="text-2xl font-serif text-gold-500">
+                        {property.price}
+                      </div>
+                      {property.bedrooms > 0 && (
+                        <div className="flex items-center text-white/70">
+                          <Bed size={18} className="mr-1" />
+                          <span>{property.bedrooms}</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-4 text-white/60 text-sm">
+                      <div className="flex items-center">
+                        <Square size={16} className="mr-1" />
+                        <span>{property.areaM2} м²</span>
+                      </div>
+                      {property.areaSqft && (
+                        <div className="flex items-center">
+                          <span>{property.areaSqft} sqft</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </Link>
               </div>
-            </Link>
-          ))}
+            )
+          })}
         </div>
 
         <div className="text-center mt-12">
