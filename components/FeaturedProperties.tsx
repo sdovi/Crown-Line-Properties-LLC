@@ -15,7 +15,7 @@ export default function FeaturedProperties() {
   const [activeImageIndex, setActiveImageIndex] = useState<Record<number, number>>({})
   const [copiedPropertyId, setCopiedPropertyId] = useState<number | null>(null)
   const sectionRef = useRef<HTMLDivElement>(null)
-  const cardsRef = useRef<(HTMLAnchorElement | null)[]>([])
+  const cardsRef = useRef<(HTMLDivElement | null)[]>([])
 
   useEffect(() => {
     const loadProperties = () => {
@@ -218,7 +218,7 @@ export default function FeaturedProperties() {
               <div
                 key={property.id}
                 ref={(el) => {
-                  if (el) cardsRef.current[index] = el as HTMLAnchorElement
+                  if (el) cardsRef.current[index] = el
                 }}
                 className="group bg-dark-lighter rounded-2xl overflow-hidden hover:bg-dark-light transition-all duration-300"
               >
